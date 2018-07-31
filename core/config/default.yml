@@ -1,0 +1,56 @@
+logLevel: info
+logName: scryio-main
+
+crypto:
+  secret: 'scissors-should-run'
+  alg: 'aes-256-ctr'
+
+graphql:
+  graphiql: false
+  # To enable default user in development,
+  # Create a local.yml with:
+  # graphql:
+  #   devUser:
+  #     userId: whatever (must exist in aggregate)
+
+elasticsearch: {
+  apiVersion: '6.2'
+  # aws: whether to use aws es connector plugin
+  # url: elasticsearch url
+}
+
+dataset:
+  # name of bucket where datasets are located
+  bucket: scryio-datasets
+
+auth:
+  jwtSecret: secret
+  maxGenerateRefreshTokenFailuresIntervalInSeconds: 60
+  maxGenerateRefreshTokenFailuresPerInterval: 3
+  refreshTokenLifetimeInHours: 720
+  accessTokenLifetimeInSeconds: 3600
+
+ddes:
+  dynamodbConcurrency: 1
+  snapshotS3Prefix: snapshots/
+  elasticsearchProjectionConcurrency: 50
+  readCapacity: 10
+  writeCapacity: 10
+  snapshotFrequency: 100
+  backupBeforeMigrations: false
+
+  autoscaling:
+    # valid autoscaling settings:
+    # tableReadMinCapacity: 10
+    # tableReadMaxCapacity: 100
+    # tableWriteMinCapacity: 
+    # tableWriteMaxCapacity:
+    # utilizationTargetInPercent:
+
+
+eventStreamServer:
+  pollDelay: 500
+  url: ws://event-stream-server
+  secret: pencil-erease-nothing
+    
+

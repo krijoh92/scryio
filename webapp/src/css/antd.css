@@ -1,0 +1,33 @@
+@import '~antd/dist/antd.css';
+
+.ant-list-vertical .ant-list-item-meta-avatar {
+  display: flex;
+}
+
+.ant-table-thead > tr > th,
+.ant-table-tbody > .item-group-table-row > td {
+  border: none;
+  padding: 8px 16px;
+}
+
+.ant-table-thead > tr > th {
+  white-space: nowrap;
+}
+
+.ant-tabs.center .ant-tabs-nav.ant-tabs-nav-animated {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ant-layout-sider-zero-width-trigger {
+  position: absolute;
+  z-index: 1000;
+  top: 10px;
+}
+
+@media (max-width: 768px) {
+  .ant-modal {
+    top: 20px;
+  }
+}

@@ -1,0 +1,7 @@
+#!/bin/ash
+
+set -e
+
+scripts/wait-for-services.js elasticsearch
+
+node services/api

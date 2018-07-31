@@ -1,0 +1,7 @@
+#!/bin/ash
+
+scripts/setup.js
+if [ ! -z "$LOAD_DATASET" ]
+then
+  scripts/load-dataset.js $LOAD_DATASET
+fi

@@ -1,0 +1,28 @@
+scalar DateTime
+
+scalar Date
+
+scalar Time
+
+type Card {
+    id: ID!
+    name: String
+    thumbnail: String
+}
+
+type Collection {
+    id: ID!
+    username: String
+    name: String
+    cards: [Card]
+}
+
+type User {
+    username: ID!
+    email: String
+    collections: [Collection]
+}
+
+type Query {
+    me: User
+}

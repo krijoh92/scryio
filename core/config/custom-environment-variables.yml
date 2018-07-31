@@ -1,0 +1,7 @@
+deploymentName: DEPLOYMENT_NAME
+stackDnsName: STACK_DNS_NAME
+dnsDomain: SWARMY_DOMAIN
+logLevel: LOG_LEVEL
+eventStreamServer:
+  url: EVENT_STREAM_SERVER_URL
+  secret: EVENT_STREAM_SERVER_SECRET

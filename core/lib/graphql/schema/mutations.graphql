@@ -1,0 +1,5 @@
+
+type Mutation {
+    # Create a new user
+    createUser(username: String!, email: String!, password: String!): User
+}

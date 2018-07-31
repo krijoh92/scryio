@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNEXT",
+    "module": "commonjs",
+    "allowJs": false,
+    "checkJs": false,
+    "esModuleInterop": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    "paths": {
+      "*": ["*"]
+    }
+  }
+}

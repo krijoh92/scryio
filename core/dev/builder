@@ -1,0 +1,18 @@
+#!/bin/ash
+
+# Delete files that do not exist in src
+# rsync -r --delete --existing --ignore-existing --exclude node_modules /src/ /core
+
+cd /src
+
+tsc --pretty --outDir /core --watch &
+
+nodemon --watch /src --ignore 'node_modules' -p "rsync \
+  --archive \
+  --delete-after \
+  --exclude node_modules \
+  --exclude '*.js' \
+  --exclude '*.ts' \
+  /src/ /core && chmod +x /core/scripts/*.js" &
+
+wait

@@ -1,0 +1,209 @@
+version: '3.4'
+
+secrets:
+  aws-config.json:
+    file: secrets/aws-config.json
+
+volumes:
+  core-compiled:
+
+x-core:
+  &core
+  depends_on: 
+    - core
+  build:
+    context: core
+    target: development
+  environment:
+    DEPLOYMENT_NAME: ${USER}-scryio
+    LOAD_DATASET: 1
+    # DEBUG: '*'
+    # NODE_DEBUG_OPTIONS: "--inspect=0.0.0.0:9222"
+  volumes:
+    - core-compiled:/core:cached
+  secrets:
+    - aws-config.json
+
+x-webapp:
+  &webapp
+  build:
+    context: webapp
+    target: development
+  volumes:
+    - /src/node_modules
+    - ./webapp:/src:cached
+
+services:
+
+  #
+  # SYSTEM SERVICES
+  #
+
+  s3:
+    image: shzmu/s3rver
+    command: s3rver --hostname 0.0.0.0 --cors --port 5000 --directory /tmp/s3 -s
+    ports:
+      - '5000:5000'
+    # networks:
+    #   app_net:
+    #     ipv4_address: 172.16.86.17
+
+  setup:
+    << : *core
+    command: ash -c "dev/setup | bunyan -o simple"
+    # extra_hosts:
+    #   - "elasticsearch:172.16.86.13"
+    #   - "dynamodb:172.16.86.14"
+    #   - "event-stream-server:172.16.86.15"
+    #   - "projector:172.16.86.16"
+    #   - "s3:172.16.86.17"
+
+  api:
+    << : *core
+    command: ash -c "dev/api | bunyan -o simple"
+    # extra_hosts:
+    #   - "elasticsearch:172.16.86.13"
+    #   - "dynamodb:172.16.86.14"
+    #   - "event-stream-server:172.16.86.15"
+    #   - "projector:172.16.86.16"
+    #   - "s3:172.16.86.17"
+    # networks:
+    #   app_net:
+    #     ipv4_address: 172.16.86.11
+    ports:
+      - '3000:3000'
+      #- '9222:9222' #debug port
+  
+  event-stream-server:
+    << : *core
+    command: ash -c "dev/event-stream-server | bunyan -o simple"
+    # extra_hosts:
+    #   - "elasticsearch:172.16.86.13"
+    #   - "dynamodb:172.16.86.14"
+    #   - "event-stream-server:172.16.86.15"
+    #   - "projector:172.16.86.16"
+    #   - "s3:172.16.86.17"
+    # networks:
+    #   app_net:
+    #     ipv4_address: 172.16.86.15
+
+  projector:
+    << : *core
+    command: ash -c "dev/projector | bunyan -o simple"
+    # extra_hosts:
+    #   - "elasticsearch:172.16.86.13"
+    #   - "dynamodb:172.16.86.14"
+    #   - "event-stream-server:172.16.86.15"
+    #   - "projector:172.16.86.16"
+    #   - "s3:172.16.86.17"
+    # networks:
+    #   app_net:
+    #     ipv4_address: 172.16.86.16
+
+  webapp:
+    << : *webapp
+    environment:
+      PORT: 80
+      REACT_APP_BACKEND_URL: 'http://localhost:3000'
+      REACT_APP_IMAGE_PROXY_URL: 'http://localhost:3001'
+      REACT_APP_API_GRAPHQL_WS_URL: 'ws://localhost:3000/graphqlws'
+    # extra_hosts:
+    #   - "localhost:172.16.86.11"
+    # networks:
+    #   app_net:
+    #     ipv4_address: 172.16.86.10
+    ports:
+      - '80:80'
+
+  #
+  # SUPPORT SERVICES
+  #
+  core:
+    << : *core
+    depends_on: []
+    command: dev/builder
+    volumes:
+      - /src/node_modules
+      - ./core:/src:cached
+      - core-compiled:/core:cached
+
+  # dynamodb:
+  #   image: socialpoint/dynalite
+  #   # networks:
+  #   #   app_net:
+  #   #     ipv4_address: 172.16.86.14
+  #   ports:
+  #     - '8000:8000'
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.2.4
+    ports:
+      - '5601:5601'
+    environment:
+      logging.quiet: 'true'
+    # networks:
+    #   app_net:
+    #     ipv4_address: 172.16.86.18
+    # extra_hosts:
+    #   - "elasticsearch:172.16.86.13"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.4
+    # networks:
+    #   app_net:
+    #     ipv4_address: 172.16.86.13
+    environment:
+      http.host: 0.0.0.0
+      transport.host: 127.0.0.1
+      logger.level: warn
+      bootstrap.memory_lock: 'true'
+      ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - '9200:9200'
+
+  datastore:
+    build: datastore
+    environment:
+      - DATASTORE_PROJECT_ID=ddes-test
+      - DATASTORE_LISTEN_ADDRESS=0.0.0.0:8081
+    ports:
+      - "8081:8081"
+
+  #
+  # TESTS
+  #
+  # cypress: 
+  #   build: cypress-tests
+  #   command: sleep infinity
+  #   depends_on:
+  #     - webapp
+  #   links:
+  #     - webapp
+  #     - api
+  #   # networks:
+  #   #   app_net:
+  #   #     ipv4_address: 172.16.86.12
+  #   environment:
+  #     - CI=true
+  #     - CYPRESS_baseUrl=http://webapp
+  #     - CYPRESS_videoRecording=false
+  #   volumes:
+  #     - /cypress-tests/node_modules
+  #     - ./cypress-tests:/cypress-tests:cached
+  #   ports:
+  #     - '8181:8181'
+
+#
+# NETWORKS
+#
+# networks:
+#   app_net:
+#     driver: bridge
+#     ipam:
+#       driver: default
+#       config:
+#         - subnet: 172.16.86.0/24

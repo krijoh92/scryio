@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+scripts/wait-for-services.js elasticsearch
+
+nodemon \
+  --watch services/projector.ts \
+  --watch lib/projections \
+  --exec ts-node \
+  $NODE_DEBUG_OPTIONS services/projector main:default \
+        collections sets users

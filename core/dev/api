@@ -1,0 +1,11 @@
+#!/bin/ash
+
+set -e
+
+scripts/wait-for-services.js elasticsearch
+
+nodemon \
+  --watch lib \
+  --watch config \
+  --watch services/api \
+  $NODE_DEBUG_OPTIONS services/api

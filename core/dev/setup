@@ -1,0 +1,8 @@
+#!/bin/ash
+
+set -e
+
+scripts/wait-for-it.sh -h elasticsearch -p 9200 -s -t 30 -q
+
+scripts/setup-external-services.js
+scripts/load-dataset.js

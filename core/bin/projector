@@ -1,0 +1,5 @@
+#!/bin/ash
+
+scripts/wait-for-services.js elasticsearch
+
+node services/projector

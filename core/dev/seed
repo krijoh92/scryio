@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+scripts/wait-for-services.js elasticsearch
+node scripts/seedData
+
+# only save dataset if seed exited successfully
+# if [ $? -eq 0 ]; then
+#   scripts/save-dataset.js ${1:-default}
+# fi

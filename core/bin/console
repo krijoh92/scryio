@@ -1,0 +1,42 @@
+#!/usr/local/bin/node --experimental-repl-await
+// #!/usr/local/bin/node --experimental-repl-await --require ts-node/register
+
+const repl = require("repl");
+const replHistory = require("repl.history");
+const lodash = require("lodash");
+
+function initializeContext(ctx) {
+  const config = require("config");
+  const aggregates = require("../lib/aggregates");
+  const stores = require("../lib/stores");
+  const lib = require("../lib");
+  const externalServices = require("../lib/externalServices");
+
+  const loadAggs = async key => {
+    const res = []
+    for await (const instance of aggregates[key].scanInstances()) {
+      res.push(instance)
+    }
+    return res
+  }
+
+  Object.assign(ctx, aggregates, lib, externalServices, {
+    config,
+    stores,
+    loadAggs,
+    search: externalServices.elasticsearch.search,
+    lo: lodash,
+  });
+}
+
+const replServer = repl.start({prompt: "> "});
+
+replServer.on("reset", ctx => {
+  for (const key of Object.keys(require.cache)) {
+    delete require.cache[key];
+  }
+  initializeContext(ctx);
+});
+
+replHistory(replServer, `${process.env.HOME}/.scryio-core-console-history`);
+initializeContext(replServer.context);

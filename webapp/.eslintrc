@@ -1,0 +1,17 @@
+{
+  "extends": ["skalar/configs/react"],
+  "rules": {
+    "react/prop-types": 0,
+    "no-magic-numbers": 0,
+    "no-process-env": 0,
+    "no-invalid-this": 0,
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "never",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ]
+  }
+}
